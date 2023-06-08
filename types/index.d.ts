@@ -10,12 +10,15 @@ export type LoginDTO = {
 	password: string;
 };
 
-export interface User {
+export interface UserResponse {
+	user: User;
+}
+
+interface User {
 	id: string;
 	firstName: string;
 	lastName: string;
 	email: string;
-	tasks: Task[];
 }
 
 export interface Task {

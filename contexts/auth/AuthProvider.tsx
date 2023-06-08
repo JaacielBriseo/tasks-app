@@ -87,7 +87,9 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			}
 			localStorage.setItem('idToken', idToken);
 			localStorage.setItem('email', email);
-
+			const { data } = await refetch();
+			const { user } = data;
+			dispatch({ type: '[Auth] - Login', payload: user });
 			return {
 				ok: true,
 			};

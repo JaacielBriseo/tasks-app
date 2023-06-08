@@ -1,4 +1,11 @@
+import { UserDashboard } from '@/components/UserDashboard';
+
 const DashboardPage = async () => {
-	return <div>DashboardPage</div>;
+	return (
+		<main>
+			Bienvenido
+			<UserDashboard />
+		</main>
+	);
 };
 export default DashboardPage;

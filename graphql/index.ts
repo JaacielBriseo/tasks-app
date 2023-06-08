@@ -37,12 +37,18 @@ export const USER_QUERY = gql`
 			lastName
 			id
 			email
-			tasks {
-				title
-				id
-				description
-				completed
-			}
 		}
 	}
+`;
+
+export const GET_TASKS_QUERY = gql`
+  query GetTasks($email: String!) {
+    tasksList(filter: { user: { email: { equals: $email } } }) {
+      items {
+        title
+        description
+        completed
+      }
+    }
+  }
 `;
