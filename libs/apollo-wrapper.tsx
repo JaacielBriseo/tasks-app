@@ -1,48 +1,40 @@
-"use client";
+'use client';
 
+import { ApolloClient, ApolloLink, HttpLink, SuspenseCache } from '@apollo/client';
 import {
-  ApolloClient,
-  ApolloLink,
-  HttpLink,
-  SuspenseCache,
-} from "@apollo/client";
-import {
-  ApolloNextAppProvider,
-  NextSSRInMemoryCache,
-  SSRMultipartLink,
-} from "@apollo/experimental-nextjs-app-support/ssr";
+	ApolloNextAppProvider,
+	NextSSRInMemoryCache,
+	SSRMultipartLink,
+} from '@apollo/experimental-nextjs-app-support/ssr';
 
 function makeClient() {
-  const httpLink = new HttpLink({
-      // https://studio.apollographql.com/public/spacex-l4uc6p/
-      uri: "https://api.8base.com/climlydnx000c08l1982m06xj",
-  });
+	const httpLink = new HttpLink({
+		// https://studio.apollographql.com/public/spacex-l4uc6p/
+		uri: 'https://api.8base.com/climlydnx000c08l1982m06xj',
+	});
 
-  return new ApolloClient({
-    cache: new NextSSRInMemoryCache(),
-    link:
-      typeof window === "undefined"
-        ? ApolloLink.from([
-            new SSRMultipartLink({
-              stripDefer: true,
-            }),
-            httpLink,
-          ])
-        : httpLink,
-  });
+	return new ApolloClient({
+		cache: new NextSSRInMemoryCache(),
+		link:
+			typeof window === 'undefined'
+				? ApolloLink.from([
+						new SSRMultipartLink({
+							stripDefer: true,
+						}),
+						httpLink,
+				  ])
+				: httpLink,
+	});
 }
 
 function makeSuspenseCache() {
-  return new SuspenseCache();
+	return new SuspenseCache();
 }
 
 export function ApolloWrapper({ children }: React.PropsWithChildren) {
-  return (
-    <ApolloNextAppProvider
-      makeClient={makeClient}
-      makeSuspenseCache={makeSuspenseCache}
-    >
-      {children}
-    </ApolloNextAppProvider>
-  );
+	return (
+		<ApolloNextAppProvider makeClient={makeClient} makeSuspenseCache={makeSuspenseCache}>
+			{children}
+		</ApolloNextAppProvider>
+	);
 }

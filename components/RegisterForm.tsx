@@ -1,9 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMutation } from '@apollo/client';
 import { Button, TextField } from '@mui/material';
-import { SIGN_UP_MUTATION } from '@/graphql';
+import { useAuthContext } from '@/hooks/useAuthContext';
 import { useForm } from '@/hooks/useForm';
 import { RegisterDTO } from '@/types';
 
@@ -19,23 +18,13 @@ const initialForm: RegisterDTO = {
 
 export const RegisterForm = () => {
 	const router = useRouter();
-	const [signUpMutation, { loading }] = useMutation(SIGN_UP_MUTATION);
+	const { handleSignUp, isLoading } = useAuthContext();
 	const { email, firstName, lastName, password, onInputChange } = useForm(initialForm);
-	
-	const handleSignUp = async () => {
-		try {
-			await signUpMutation({
-				variables: {
-					email,
-					firstName,
-					lastName,
-					password,
-					authProfileId: process.env.NEXT_PUBLIC_DB_AUTH,
-				},
-			});
+
+	const onSignUp = async () => {
+		const { ok, msg } = await handleSignUp({ email, firstName, lastName, password });
+		if (ok) {
 			router.push('/dashboard');
-		} catch (error) {
-			console.error(error);
 		}
 	};
 
@@ -88,8 +77,8 @@ export const RegisterForm = () => {
 			/>
 
 			<Button
-				disabled={loading}
-				onClick={handleSignUp}
+				disabled={isLoading}
+				onClick={onSignUp}
 				variant='contained'
 				color='info'
 				sx={{ mt: 3, py: 1.3, color: 'whitesmoke' }}

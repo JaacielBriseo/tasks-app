@@ -1,6 +1,4 @@
-const DashboardPage = () => {
-  return (
-    <div>DashboardPage</div>
-  )
-}
-export default DashboardPage
+const DashboardPage = async () => {
+	return <div>DashboardPage</div>;
+};
+export default DashboardPage;
