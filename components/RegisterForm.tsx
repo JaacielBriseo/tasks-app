@@ -1,25 +1,44 @@
 'use client';
 
-import { useForm } from '@/hooks/useForm';
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@apollo/client';
 import { Button, TextField } from '@mui/material';
-
-interface RegisterForm {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-}
+import { SIGN_UP_MUTATION } from '@/graphql';
+import { useForm } from '@/hooks/useForm';
+import { RegisterDTO } from '@/types';
 
 //* Variable declarada fuera del componente para evitar que se vuelva a computar en cada render
-const initialForm: RegisterForm = {
+const initialForm: RegisterDTO = {
 	firstName: '',
 	lastName: '',
 	email: '',
 	password: '',
 };
+//TODO: Validar password minimo de 9 caracters para evitar error
+//TODO: Validar formato email
 
 export const RegisterForm = () => {
+	const router = useRouter();
+	const [signUpMutation, { loading }] = useMutation(SIGN_UP_MUTATION);
 	const { email, firstName, lastName, password, onInputChange } = useForm(initialForm);
+	
+	const handleSignUp = async () => {
+		try {
+			await signUpMutation({
+				variables: {
+					email,
+					firstName,
+					lastName,
+					password,
+					authProfileId: process.env.NEXT_PUBLIC_DB_AUTH,
+				},
+			});
+			router.push('/dashboard');
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	return (
 		<>
 			<TextField
@@ -62,12 +81,19 @@ export const RegisterForm = () => {
 				autoFocus
 				label='Contraseña'
 				variant='standard'
+				type='password'
 				name='password'
 				value={password}
 				onChange={onInputChange}
 			/>
 
-			<Button variant='contained' color='info' sx={{ mt: 3, py: 1.3, color: 'whitesmoke' }} fullWidth>
+			<Button
+				disabled={loading}
+				onClick={handleSignUp}
+				variant='contained'
+				color='info'
+				sx={{ mt: 3, py: 1.3, color: 'whitesmoke' }}
+				fullWidth>
 				Registrarme
 			</Button>
 		</>
