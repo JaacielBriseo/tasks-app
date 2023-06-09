@@ -8,6 +8,7 @@ interface ContextProps {
 	isLoadingTasks: boolean;
 	error: null | string;
 	isDeleteModalOpen: boolean;
+	isDragging:boolean;
 
 	//* Methods
 	toggleAddingTask: () => void;
@@ -16,6 +17,9 @@ interface ContextProps {
 	handleCloseDeleteModal: () => void;
 	handleOpenDeleteModal: () => void;
 	refetchTasks: () => Promise<void>;
+	endDragging: () => void;
+	startDragging: () => void;
+	startChangingTaskCompletedStatus: (taskId: string, completed: boolean) => Promise<any>
 }
 
 export const TasksContext = createContext({} as ContextProps);

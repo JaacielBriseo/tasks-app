@@ -11,12 +11,14 @@ export interface TasksState {
 	isAddingTask: boolean;
 	isLoadingTasks: boolean;
 	error: null | string;
+	isDragging: boolean;
 }
 
 const Tasks_INITIAL_STATE: TasksState = {
 	tasks: [],
 	isAddingTask: false,
 	error: null,
+	isDragging: false,
 	/**
 	 * El loading state en este caso inicia en true
 	 * para evitar problemas de UI al momento de hacer la
@@ -100,18 +102,50 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	}, [loadInitialTasks, tasksData]);
 
 	const toggleAddingTask = () => dispatch({ type: '[Task] - Toggle Add Task' });
+	const startDragging = () => {
+		dispatch({ type: '[Task] - Start Dragging Task' });
+	};
+
+	const endDragging = () => {
+		dispatch({ type: '[Task] - End Dragging Task' });
+	};
+
+	const startChangingTaskCompletedStatus = async (taskId: string, completed: boolean) => {
+		try {
+			const resp = await fetch('https://api.8base.com/climlydnx000c08l1982m06xj/webhook/toggleTaskCompleted', {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify({
+					taskId,
+					completed,
+				}),
+			});
+			dispatch({ type: '[Task] - Change Task Completed Status', payload: { taskId, completed } });
+		} catch (error) {
+			console.error(error);
+			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
+		}
+	};
 
 	return (
 		<TasksContext.Provider
 			value={{
+				//* Properties
 				...state,
 				isDeleteModalOpen,
+
+				//* Methods
 				handleOpenDeleteModal,
 				handleCloseDeleteModal,
 				toggleAddingTask,
 				startAddingNewTask,
 				handleDelete,
 				refetchTasks,
+				startDragging,
+				endDragging,
+				startChangingTaskCompletedStatus,
 			}}>
 			{children}
 		</TasksContext.Provider>
