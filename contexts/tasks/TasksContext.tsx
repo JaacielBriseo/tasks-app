@@ -23,3 +23,5 @@ interface ContextProps {
 }
 
 export const TasksContext = createContext({} as ContextProps);
+
+export default TasksContext

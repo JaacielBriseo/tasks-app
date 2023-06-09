@@ -87,7 +87,6 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			};
 		} catch (error) {
 			console.error(error);
-			handleLogout();
 			return {
 				ok: false,
 				msg: 'Ocurrió algun error, vuelva a intentarlo. Si el problema persiste, contacte a un administrador',
@@ -120,3 +119,5 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		</AuthContext.Provider>
 	);
 };
+
+export default AuthProvider

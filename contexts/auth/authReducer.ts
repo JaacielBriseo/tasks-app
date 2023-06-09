@@ -1,5 +1,5 @@
 import { User } from '@/types';
-import { AuthState } from '.';
+import { AuthState } from './AuthProvider';
 type AuthActionType = { type: '[Auth] - Login'; payload: User } | { type: '[Auth] - Logout' };
 export const authReducer = (state: AuthState, action: AuthActionType): AuthState => {
 	switch (action.type) {
@@ -17,3 +17,4 @@ export const authReducer = (state: AuthState, action: AuthActionType): AuthState
 			return state;
 	}
 };
+export default authReducer;

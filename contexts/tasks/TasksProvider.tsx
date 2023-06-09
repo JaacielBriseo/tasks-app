@@ -5,7 +5,6 @@ import { useSnackbar } from 'notistack';
 import { CREATE_TASK_MUTATION, DELETE_TASK_MUTATION, GET_TASKS_QUERY } from '@/graphql';
 import { Task } from '@/types';
 import { TasksContext, tasksReducer } from '.';
-import { useAuthContext } from '@/hooks/useAuthContext';
 export interface TasksState {
 	tasks: Task[];
 	isAddingTask: boolean;
@@ -28,8 +27,7 @@ const Tasks_INITIAL_STATE: TasksState = {
 	isLoadingTasks: true,
 };
 export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const [state, dispatch] = useReducer(tasksReducer, Tasks_INITIAL_STATE);
-	const { user } = useAuthContext();
+	const [state, dispatch] = useReducer(tasksReducer, Tasks_INITIAL_STATE);;
 	const { enqueueSnackbar } = useSnackbar();
 	const [createTaskMutation] = useMutation(CREATE_TASK_MUTATION);
 	const [deleteTaskMutation] = useMutation(DELETE_TASK_MUTATION);
@@ -155,3 +153,5 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		</TasksContext.Provider>
 	);
 };
+
+export default TasksProvider

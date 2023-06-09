@@ -16,3 +16,5 @@ interface ContextProps {
 }
 
 export const AuthContext = createContext({} as ContextProps);
+
+export default AuthContext

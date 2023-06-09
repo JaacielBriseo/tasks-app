@@ -1,5 +1,5 @@
 import { Task } from '@/types';
-import { TasksState } from '.';
+import { TasksState } from './TasksProvider';
 type TaskActionType =
 	| { type: '[Task] - Toggle Add Task' }
 	| { type: '[Task] - Load Initial Tasks'; payload: Task[] }
@@ -69,3 +69,4 @@ export const tasksReducer = (state: TasksState, action: TaskActionType): TasksSt
 			return state;
 	}
 };
+export default tasksReducer;
