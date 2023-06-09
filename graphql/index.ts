@@ -49,6 +49,7 @@ export const GET_TASKS_QUERY = gql`
 					id
 					description
 					completed
+					createdAt
 					assignedTo {
 						items {
 							firstName
@@ -61,26 +62,20 @@ export const GET_TASKS_QUERY = gql`
 `;
 
 export const CREATE_TASK_MUTATION = gql`
-  mutation TaskCreate($description: String!, $userEmail: String!) {
-    taskCreate(data: {
-      description: $description,
-      user: {
-        connect: {
-          email: $userEmail
-        }
-      }
-    }) {
-      id
-      description
-      completed
-      assignedTo {
-        items {
-          email
-          firstName
-          lastName
-          id
-        }
-      }
-    }
-  }
+	mutation TaskCreate($description: String!, $userEmail: String!) {
+		taskCreate(data: { description: $description, user: { connect: { email: $userEmail } } }) {
+			id
+			description
+			completed
+			createdAt
+			assignedTo {
+				items {
+					email
+					firstName
+					lastName
+					id
+				}
+			}
+		}
+	}
 `;

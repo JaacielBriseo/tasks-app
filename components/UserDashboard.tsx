@@ -12,7 +12,7 @@ export const UserDashboard = () => {
 		<>
 			<Grid container spacing={4} sx={{ p: 4 }}>
 				<Grid item xs={12} sm={6}>
-					<Card sx={{ height: 'calc(100vh - 100px )' }}>
+					<Card sx={{ minHeight: 'calc(100vh - 100px )' }}>
 						<CardHeader title='Pendientes' />
 
 						{/* Agregar una nueva tarea */}

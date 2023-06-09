@@ -23,7 +23,7 @@ export const TasksList: React.FC<Props> = ({ tasks, completedStatus }) => {
 			<Paper
 				sx={{
 					height: 'calc(100vh - 100px)',
-					overflow: 'scroll',
+					overflow: 'auto',
 					backgroundColor: 'transparent',
 					'&::-webkit-scrollbar': { display: 'none' },
 					padding: '1px 5px',

@@ -25,6 +25,7 @@ export interface Task {
 	id: string;
 	description: string;
 	completed: boolean;
+	createdAt:string;
 	assignedTo: {
 		items: User[];
 	};
