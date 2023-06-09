@@ -1,11 +1,10 @@
 import { PropsWithChildren, useReducer, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { decode } from 'jsonwebtoken';
+import { decodeJwt } from 'jose';
 import Cookies from 'js-cookie';
 import { DecodedPayload, LoginDTO, LoginResponse, RegisterDTO, User } from '@/types';
 import { LOGIN_MUTATION, SIGN_UP_MUTATION, USER_QUERY } from '@/graphql';
 import { AuthContext, authReducer } from '.';
-import { useRouter } from 'next/navigation';
 
 export interface AuthState {
 	user: User | null;
@@ -16,7 +15,6 @@ const Auth_INITIAL_STATE: AuthState = {
 };
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [state, dispatch] = useReducer(authReducer, Auth_INITIAL_STATE);
-	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [loginMutation] = useMutation(LOGIN_MUTATION);
 	const [signUpMutation] = useMutation(SIGN_UP_MUTATION);
@@ -68,8 +66,8 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				},
 			} = response as LoginResponse;
 			Cookies.set('idToken', idToken);
-			const decoded = decode(idToken);
-			const { email: decodedEmail } = decoded as DecodedPayload;
+			const decoded = decodeJwt(idToken);
+			const { email: decodedEmail } = decoded as any;
 			Cookies.set('userEmail', decodedEmail);
 			if (decodedEmail !== email) {
 				handleLogout();
@@ -120,4 +118,4 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	);
 };
 
-export default AuthProvider
+export default AuthProvider;
