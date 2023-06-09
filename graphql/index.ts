@@ -44,7 +44,7 @@ export const USER_QUERY = gql`
 export const GET_TASKS_QUERY = gql`
 	query User($email: String!) {
 		user(email: $email) {
-			userTasks {
+			tasks {
 				items {
 					id
 					description
@@ -66,7 +66,7 @@ export const GET_TASKS_QUERY = gql`
 
 export const CREATE_TASK_MUTATION = gql`
 	mutation TaskCreate($description: String!, $userEmail: String!) {
-		taskCreate(data: { description: $description, user: { connect: { email: $userEmail } } }) {
+		taskCreate(data: { description: $description, userTasks: { connect: { email: $userEmail } } }) {
 			id
 			description
 			completed

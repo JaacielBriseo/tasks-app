@@ -1,9 +1,11 @@
+'use client';
 import { useRouter } from 'next/navigation';
-import { Button, Link, TextField } from '@mui/material';
-import { useForm } from '@/hooks/useForm';
-import { useAuthContext } from '@/hooks/useAuthContext';
-import { LoginDTO } from '@/types';
 import NextLink from 'next/link';
+import { Button, Chip, Link, TextField } from '@mui/material';
+import { useAuthContext } from '@/hooks/useAuthContext';
+import { useForm } from '@/hooks/useForm';
+import { LoginDTO } from '@/types';
+import { useEffect, useState } from 'react';
 
 const initialForm: LoginDTO = {
 	email: '',
@@ -13,17 +15,44 @@ const initialForm: LoginDTO = {
 export const LoginForm = () => {
 	const router = useRouter();
 	const { email, onInputChange, password } = useForm(initialForm);
+	const [error, setError] = useState<undefined | string>(undefined);
 	const { handleLogin, isLoading } = useAuthContext();
 
 	const onLogin = async () => {
-		const { ok } = await handleLogin({ email, password });
+		const { ok, msg } = await handleLogin({ email, password });
 		if (ok) {
 			router.push('/dashboard');
 		}
+		if (!ok) {
+			setError(msg);
+		}
 	};
+
+	useEffect(() => {
+		if (!error) return;
+		const timeout = setTimeout(() => {
+			setError(undefined);
+		}, 5000);
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, [error]);
 
 	return (
 		<>
+			{error && (
+				<Chip
+					sx={{
+						height: 'auto',
+						'& .MuiChip-label': {
+							display: 'block',
+							whiteSpace: 'normal',
+						},
+					}}
+					label={error}
+					color='error'
+				/>
+			)}
 			<TextField
 				fullWidth
 				sx={{ marginTop: 2, marginBottom: 1 }}

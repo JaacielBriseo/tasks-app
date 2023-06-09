@@ -1,6 +1,8 @@
+'use client';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
-import { Button, Link, TextField } from '@mui/material';
+import { Button, Chip, Link, TextField } from '@mui/material';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useForm } from '@/hooks/useForm';
 import { RegisterDTO } from '@/types';
@@ -12,12 +14,11 @@ const initialForm: RegisterDTO = {
 	email: '',
 	password: '',
 };
-//TODO: Validar password minimo de 9 caracters para evitar error
-//TODO: Validar formato email
 
 export const RegisterForm = () => {
 	const router = useRouter();
 	const { handleSignUp, isLoading } = useAuthContext();
+	const [error, setError] = useState<undefined | string>(undefined);
 	const { email, firstName, lastName, password, onInputChange } = useForm(initialForm);
 
 	const onSignUp = async () => {
@@ -25,10 +26,36 @@ export const RegisterForm = () => {
 		if (ok) {
 			router.push('/dashboard');
 		}
+		if (!ok) {
+			setError(msg);
+		}
 	};
+
+	useEffect(() => {
+		if (!error) return;
+		const timeout = setTimeout(() => {
+			setError(undefined);
+		}, 5000);
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, [error]);
 
 	return (
 		<>
+			{error && (
+				<Chip
+					sx={{
+						height: 'auto',
+						'& .MuiChip-label': {
+							display: 'block',
+							whiteSpace: 'normal',
+						},
+					}}
+					label={error}
+					color='error'
+				/>
+			)}
 			<TextField
 				fullWidth
 				sx={{ marginTop: 2, marginBottom: 1 }}

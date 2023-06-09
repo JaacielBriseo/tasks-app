@@ -46,10 +46,11 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			},
 		},
 	});
+	console.log({ idToken });
 
 	const refetchTasks = async () => {
 		const { data } = await refetch();
-		dispatch({ type: '[Task] - Load Initial Tasks', payload: data.user.userTasks.items });
+		dispatch({ type: '[Task] - Load Initial Tasks', payload: data.user.tasks.items });
 	};
 	const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
 	const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
@@ -59,7 +60,7 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			dispatch({ type: '[Task] - Set Error', payload: errorTasks.message });
 		}
 		if (!tasksData) return;
-		const tasks = tasksData.user.userTasks.items as Task[];
+		const tasks = tasksData.user.tasks.items as Task[];
 		dispatch({ type: '[Task] - Load Initial Tasks', payload: tasks });
 	}, [tasksData, errorTasks]);
 
@@ -109,7 +110,7 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
 	const startChangingTaskCompletedStatus = async (taskId: string, completed: boolean) => {
 		try {
-			const resp = await fetch('https://api.8base.com/climlydnx000c08l1982m06xj/webhook/toggleTaskCompleted', {
+			await fetch('https://api.8base.com/cliouei6v005d08lc3kq130yd/webhook/toggleTaskCompletedStatus', {
 				headers: {
 					'Content-Type': 'application/json',
 				},

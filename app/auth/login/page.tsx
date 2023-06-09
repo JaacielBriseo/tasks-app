@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import { LoginForm } from '@/components/LoginForm';
 import { Box, Card, CardHeader } from '@mui/material';
 

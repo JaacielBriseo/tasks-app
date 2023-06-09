@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			handleLogout();
 			return {
 				ok: false,
-				msg: 'Ocurrió algun error, contacte a un administrador',
+				msg: 'Ocurrió algun error, vuelva a intentarlo. Si el problema persiste, contacte a un administrador',
 			};
 		} finally {
 			setIsLoading(false);

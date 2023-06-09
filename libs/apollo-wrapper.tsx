@@ -9,7 +9,7 @@ import {
 
 function makeClient() {
 	const httpLink = new HttpLink({
-		uri: 'https://api.8base.com/climlydnx000c08l1982m06xj',
+		uri: 'https://api.8base.com/cliouei6v005d08lc3kq130yd',
 	});
 
 	return new ApolloClient({

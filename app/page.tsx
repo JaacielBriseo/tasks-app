@@ -1,3 +1,4 @@
+'use client'
 import NextLink from 'next/link';
 import { Box, Button, Card, CardContent, CardHeader } from '@mui/material';
 
