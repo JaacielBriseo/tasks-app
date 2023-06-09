@@ -4,9 +4,11 @@ import { useMutation } from '@apollo/client';
 import { UPDATE_TASK_MUTATION, UPDATE_TASK_MUTATION_WITH_ASSIGN } from '@/graphql';
 import { Task } from '@/types';
 import { useForm } from './useForm';
+import { useSnackbar } from 'notistack';
 
 export const useTaskUpdate = (task: Task) => {
 	const router = useRouter();
+	const { enqueueSnackbar } = useSnackbar();
 	const { descriptionValue, onInputChange, userEmailToAssign } = useForm({
 		descriptionValue: task.description,
 		userEmailToAssign: '',
@@ -41,6 +43,14 @@ export const useTaskUpdate = (task: Task) => {
 		if (userEmailToAssign.trim().length > 5 && userEmailToAssign.includes('@')) {
 			variables.email = userEmailToAssign;
 			await updateTaskMutationWithAssign({ variables });
+			enqueueSnackbar('Tarea actualizada', {
+				variant: 'success',
+				autoHideDuration: 1500,
+				anchorOrigin: {
+					vertical: 'top',
+					horizontal: 'right',
+				},
+			});
 			router.push('/dashboard');
 			return;
 		}
@@ -51,6 +61,14 @@ export const useTaskUpdate = (task: Task) => {
 		 * entonces cae en esta mutacion
 		 */
 		await updateTaskMutation({ variables });
+		enqueueSnackbar('Entrada actualizada', {
+			variant: 'success',
+			autoHideDuration: 1500,
+			anchorOrigin: {
+				vertical: 'top',
+				horizontal: 'right',
+			},
+		});
 		router.push('/dashboard');
 	};
 
