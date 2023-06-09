@@ -7,8 +7,8 @@ export const formatDateFromNow = (timestamp: string) => {
 	const horasTranscurridas = Math.floor(minutosTranscurridos / 60);
 
 	if (horasTranscurridas > 0) {
-		return `Creado hace ${horasTranscurridas} hora(s) atrás`;
+		return `Creado hace ${horasTranscurridas} hora(s)`;
 	} else {
-		return `Creado hace ${minutosTranscurridos} minuto(s) `;
+		return `Creado hace ${minutosTranscurridos} minuto(s)`;
 	}
 };

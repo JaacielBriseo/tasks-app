@@ -53,6 +53,9 @@ export const GET_TASKS_QUERY = gql`
 					assignedTo {
 						items {
 							firstName
+							lastName
+							email
+							id
 						}
 					}
 				}
@@ -74,6 +77,47 @@ export const CREATE_TASK_MUTATION = gql`
 					firstName
 					lastName
 					id
+				}
+			}
+		}
+	}
+`;
+
+export const UPDATE_TASK_MUTATION_WITH_ASSIGN = gql`
+	mutation TaskUpdate($taskId: ID!, $completed: Boolean!, $description: String!, $email: String) {
+		taskUpdate(
+			filter: { id: $taskId }
+			data: { completed: $completed, description: $description, assignedTo: { connect: { email: $email } } }
+		) {
+			id
+			createdAt
+			description
+			completed
+			assignedTo {
+				items {
+					id
+					firstName
+					lastName
+					email
+				}
+			}
+		}
+	}
+`;
+
+export const UPDATE_TASK_MUTATION = gql`
+	mutation TaskUpdate($taskId: ID!, $completed: Boolean!, $description: String!) {
+		taskUpdate(filter: { id: $taskId }, data: { completed: $completed, description: $description }) {
+			id
+			createdAt
+			description
+			completed
+			assignedTo {
+				items {
+					id
+					firstName
+					lastName
+					email
 				}
 			}
 		}

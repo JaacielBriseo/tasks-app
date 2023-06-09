@@ -9,11 +9,13 @@ export interface TasksState {
 	tasks: Task[];
 	isAddingTask: boolean;
 	isLoadingTasks: boolean;
+	error: null | string;
 }
 
 const Tasks_INITIAL_STATE: TasksState = {
 	tasks: [],
 	isAddingTask: false,
+	error: null,
 	/**
 	 * El loading state en este caso inicia en true
 	 * para evitar problemas de UI al momento de hacer la
@@ -28,7 +30,7 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [createTaskMutation] = useMutation(CREATE_TASK_MUTATION);
 	const email = Cookies.get('userEmail');
 	const idToken = Cookies.get('idToken');
-	const { data: tasksData } = useQuery(GET_TASKS_QUERY, {
+	const { data: tasksData, error: errorTasks } = useQuery(GET_TASKS_QUERY, {
 		variables: { email },
 		context: {
 			headers: {
@@ -38,9 +40,13 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	});
 
 	const loadInitialTasks = useCallback(() => {
+		if (errorTasks) {
+			dispatch({ type: '[Task] - Set Error', payload: errorTasks.message });
+		}
+		if (!tasksData) return;
 		const tasks = tasksData.user.userTasks.items as Task[];
 		dispatch({ type: '[Task] - Load Initial Tasks', payload: tasks });
-	}, [tasksData]);
+	}, [tasksData, errorTasks]);
 
 	const startAddingNewTask = async (description: string) => {
 		try {
@@ -53,9 +59,8 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	};
 
 	useEffect(() => {
-		if (!tasksData) return;
 		loadInitialTasks();
-	}, [loadInitialTasks, tasksData]);
+	}, [loadInitialTasks]);
 
 	const toggleAddingTask = () => dispatch({ type: '[Task] - Toggle Add Task' });
 

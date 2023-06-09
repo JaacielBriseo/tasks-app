@@ -6,7 +6,7 @@ export const middleware = async (req: NextRequest) => {
 	const path = req.nextUrl.pathname;
 
 	//* Si no hay usuario con sesión activa , prevenir que acceda a dashboard
-	if (path.startsWith('/dashboard') && !user) {
+	if ((path.startsWith('/dashboard') || path.startsWith('/tasks')) && !user) {
 		return NextResponse.redirect(new URL('/auth/login', req.url));
 	}
 
