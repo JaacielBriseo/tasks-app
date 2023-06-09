@@ -5,7 +5,8 @@ type TaskActionType =
 	| { type: '[Task] - Load Initial Tasks'; payload: Task[] }
 	| { type: '[Task] - Set Loading State'; payload: boolean }
 	| { type: '[Task] - Add New Task'; payload: Task }
-	| { type: '[Task] - Set Error'; payload: string };
+	| { type: '[Task] - Set Error'; payload: string }
+	| { type: '[Task] - Delete Task'; payload: string };
 export const tasksReducer = (state: TasksState, action: TaskActionType): TasksState => {
 	switch (action.type) {
 		case '[Task] - Toggle Add Task':
@@ -18,6 +19,7 @@ export const tasksReducer = (state: TasksState, action: TaskActionType): TasksSt
 				...state,
 				tasks: action.payload,
 				isLoadingTasks: false,
+				error: null,
 			};
 		case '[Task] - Set Loading State':
 			return {
@@ -33,6 +35,11 @@ export const tasksReducer = (state: TasksState, action: TaskActionType): TasksSt
 			return {
 				...state,
 				error: action.payload,
+			};
+		case '[Task] - Delete Task':
+			return {
+				...state,
+				tasks: state.tasks.filter(task => task.id !== action.payload),
 			};
 		default:
 			return state;

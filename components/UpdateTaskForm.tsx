@@ -17,6 +17,7 @@ import {
 	List,
 	ListItem,
 	ListItemText,
+	Modal,
 	Radio,
 	RadioGroup,
 	TextField,
@@ -30,20 +31,27 @@ interface Props {
 	taskId: string;
 }
 export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
-	const { tasks } = useTasksContext();
+	const { tasks, handleDelete, isDeleteModalOpen, handleCloseDeleteModal, handleOpenDeleteModal } = useTasksContext();
 	const task = tasks.find(task => task.id === taskId);
 	if (!task) {
 		notFound();
 	}
+	/**
+	 * Decidí hacer toda la logica del update
+	 * fuera del TaskContext debido a que es mucho codigo
+	 * y a mi parecer es mas legible verlo de esta manera
+	 */
 	const {
+		//* Properties
 		descriptionValue,
 		isNotValid,
+		userEmailToAssign,
+		status,
+		//* Methods
+		onStatusChanged,
 		onInputChange,
 		onSave,
 		setTouched,
-		status,
-		onStatusChanged,
-		userEmailToAssign,
 	} = useTaskUpdate(task);
 	return (
 		<>
@@ -122,6 +130,7 @@ export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
 				</Grid>
 			</Grid>
 			<IconButton
+				onClick={handleOpenDeleteModal}
 				sx={{
 					position: 'fixed',
 					bottom: 30,
@@ -130,6 +139,46 @@ export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
 				}}>
 				<DeleteOutlined />
 			</IconButton>
+			<Modal
+				open={isDeleteModalOpen}
+				onClose={handleCloseDeleteModal}
+				aria-labelledby='modal-modal-title'
+				aria-describedby='modal-modal-description'>
+				<Box
+					sx={{
+						position: 'absolute',
+						top: '50%',
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+						width: 400,
+						bgcolor: 'grey',
+						border: '2px solid #000',
+						boxShadow: 24,
+						p: 4,
+					}}>
+					<Typography id='modal-modal-title' variant='h6' component='h2'>
+						Estas seguro que quieres eliminar esta tarea?
+					</Typography>
+					<Typography id='modal-modal-description' sx={{ mt: 2 }}>
+						Este proceso no puede ser revertido
+					</Typography>
+					<Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} gap={2}>
+						<Button fullWidth variant='outlined' color='info'>
+							Cancelar
+						</Button>
+						<Button
+							onClick={() => {
+								handleDelete(task.id);
+								handleCloseDeleteModal();
+							}}
+							fullWidth
+							variant='contained'
+							color='error'>
+							Eliminar
+						</Button>
+					</Box>
+				</Box>
+			</Modal>
 		</>
 	);
 };

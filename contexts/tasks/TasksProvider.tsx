@@ -1,10 +1,11 @@
-import { PropsWithChildren, useCallback, useEffect, useReducer } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useReducer, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@apollo/client';
 import Cookies from 'js-cookie';
-import { CREATE_TASK_MUTATION, GET_TASKS_QUERY } from '@/graphql';
+import { useSnackbar } from 'notistack';
+import { CREATE_TASK_MUTATION, DELETE_TASK_MUTATION, GET_TASKS_QUERY } from '@/graphql';
 import { Task } from '@/types';
 import { TasksContext, tasksReducer } from '.';
-
 export interface TasksState {
 	tasks: Task[];
 	isAddingTask: boolean;
@@ -24,13 +25,20 @@ const Tasks_INITIAL_STATE: TasksState = {
 	 */
 	isLoadingTasks: true,
 };
-//TODO: Manejar errores
 export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
+	const router = useRouter();
 	const [state, dispatch] = useReducer(tasksReducer, Tasks_INITIAL_STATE);
+	const { enqueueSnackbar } = useSnackbar();
 	const [createTaskMutation] = useMutation(CREATE_TASK_MUTATION);
+	const [deleteTaskMutation] = useMutation(DELETE_TASK_MUTATION);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const email = Cookies.get('userEmail');
 	const idToken = Cookies.get('idToken');
-	const { data: tasksData, error: errorTasks } = useQuery(GET_TASKS_QUERY, {
+	const {
+		data: tasksData,
+		error: errorTasks,
+		refetch,
+	} = useQuery(GET_TASKS_QUERY, {
 		variables: { email },
 		context: {
 			headers: {
@@ -38,6 +46,13 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			},
 		},
 	});
+
+	const refetchTasks = async () => {
+		const { data } = await refetch();
+		dispatch({ type: '[Task] - Load Initial Tasks', payload: data.user.userTasks.items });
+	};
+	const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
+	const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
 	const loadInitialTasks = useCallback(() => {
 		if (errorTasks) {
@@ -54,17 +69,51 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			const newTask = response.data.taskCreate;
 			dispatch({ type: '[Task] - Add New Task', payload: newTask });
 		} catch (error) {
-			console.log(error);
+			console.error(error);
+			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
+		}
+	};
+
+	const handleDelete = async (taskId: string) => {
+		try {
+			const { data } = await deleteTaskMutation({ variables: { taskId } });
+			const { taskDelete } = data;
+			const { success } = taskDelete;
+			enqueueSnackbar(success ? 'Tarea eliminada' : 'Hubo un problema al eliminar la tarea', {
+				variant: success ? 'success' : 'error',
+				autoHideDuration: 1500,
+				anchorOrigin: {
+					vertical: 'top',
+					horizontal: 'right',
+				},
+			});
+			dispatch({ type: '[Task] - Delete Task', payload: taskId });
+			router.push('/dashboard');
+		} catch (error) {
+			console.error(error);
+			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
 		}
 	};
 
 	useEffect(() => {
 		loadInitialTasks();
-	}, [loadInitialTasks]);
+	}, [loadInitialTasks, tasksData]);
 
 	const toggleAddingTask = () => dispatch({ type: '[Task] - Toggle Add Task' });
 
 	return (
-		<TasksContext.Provider value={{ ...state, toggleAddingTask, startAddingNewTask }}>{children}</TasksContext.Provider>
+		<TasksContext.Provider
+			value={{
+				...state,
+				isDeleteModalOpen,
+				handleOpenDeleteModal,
+				handleCloseDeleteModal,
+				toggleAddingTask,
+				startAddingNewTask,
+				handleDelete,
+				refetchTasks,
+			}}>
+			{children}
+		</TasksContext.Provider>
 	);
 };

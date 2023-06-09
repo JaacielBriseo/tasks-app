@@ -96,6 +96,8 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	};
 
 	const handleLogout = () => {
+		Cookies.remove('idToken');
+		Cookies.remove('userEmail');
 		dispatch({ type: '[Auth] - Logout' });
 	};
 

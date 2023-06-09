@@ -123,3 +123,11 @@ export const UPDATE_TASK_MUTATION = gql`
 		}
 	}
 `;
+
+export const DELETE_TASK_MUTATION = gql`
+	mutation TaskDelete($taskId: ID!) {
+		taskDelete(filter: { id: $taskId }) {
+			success
+		}
+	}
+`;

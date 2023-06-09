@@ -1,13 +1,15 @@
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK_MUTATION, UPDATE_TASK_MUTATION_WITH_ASSIGN } from '@/graphql';
+import { useSnackbar } from 'notistack';
+import { UPDATE_TASK_MUTATION, UPDATE_TASK_MUTATION_WITH_ASSIGN, DELETE_TASK_MUTATION } from '@/graphql';
 import { Task } from '@/types';
 import { useForm } from './useForm';
-import { useSnackbar } from 'notistack';
+import { useTasksContext } from './useTasksContext';
 
 export const useTaskUpdate = (task: Task) => {
 	const router = useRouter();
+	const { refetchTasks } = useTasksContext();
 	const { enqueueSnackbar } = useSnackbar();
 	const { descriptionValue, onInputChange, userEmailToAssign } = useForm({
 		descriptionValue: task.description,
@@ -51,6 +53,7 @@ export const useTaskUpdate = (task: Task) => {
 					horizontal: 'right',
 				},
 			});
+			await refetchTasks();
 			router.push('/dashboard');
 			return;
 		}
@@ -61,6 +64,7 @@ export const useTaskUpdate = (task: Task) => {
 		 * entonces cae en esta mutacion
 		 */
 		await updateTaskMutation({ variables });
+		await refetchTasks();
 		enqueueSnackbar('Entrada actualizada', {
 			variant: 'success',
 			autoHideDuration: 1500,
@@ -79,7 +83,6 @@ export const useTaskUpdate = (task: Task) => {
 		userEmailToAssign,
 		touched,
 		isNotValid,
-
 		//* Methods
 		onInputChange,
 		onStatusChanged,
