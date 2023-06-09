@@ -2,7 +2,7 @@ import { ChangeEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
 import { useSnackbar } from 'notistack';
-import { UPDATE_TASK_MUTATION, UPDATE_TASK_MUTATION_WITH_ASSIGN, DELETE_TASK_MUTATION } from '@/graphql';
+import { UPDATE_TASK_MUTATION, UPDATE_TASK_MUTATION_WITH_ASSIGN } from '@/graphql';
 import { Task } from '@/types';
 import { useForm } from './useForm';
 import { useTasksContext } from './useTasksContext';
@@ -35,16 +35,26 @@ export const useTaskUpdate = (task: Task) => {
 			description: descriptionValue,
 			taskId: task.id,
 		};
-
-		/**
-		 * Si el usuario escribe algo sobre el input del email
-		 * cae en esta validacion y hace la mutation
-		 * que incluye el update del campo assignedTo
-		 * que representa la coleccion de usuarios a los que se les asigno la tarea
-		 */
-		if (userEmailToAssign.trim().length > 5 && userEmailToAssign.includes('@')) {
-			variables.email = userEmailToAssign;
-			await updateTaskMutationWithAssign({ variables });
+		try {
+			/**
+			 * Si el usuario escribe algo sobre el input del email
+			 * cae en esta validacion y hace la mutation
+			 * que incluye el update del campo assignedTo
+			 * que representa la coleccion de usuarios a los que se les asigno la tarea
+			 */
+			if (userEmailToAssign.trim().length > 5 && userEmailToAssign.includes('@')) {
+				variables.email = userEmailToAssign;
+				await updateTaskMutationWithAssign({ variables });
+			} else {
+				await updateTaskMutation({ variables });
+			}
+			/**
+			 * Si el usuario no escribe en el input del email
+			 * significa que solo quiere actualizar la descripción
+			 * o el status de la tarea
+			 * entonces cae en esta mutacion
+			 */
+			await refetchTasks();
 			enqueueSnackbar('Tarea actualizada', {
 				variant: 'success',
 				autoHideDuration: 1500,
@@ -53,27 +63,18 @@ export const useTaskUpdate = (task: Task) => {
 					horizontal: 'right',
 				},
 			});
-			await refetchTasks();
 			router.push('/dashboard');
-			return;
+		} catch (error) {
+			enqueueSnackbar(error instanceof Error ? error.message : 'Ocurrio algun error, intente mas tarde', {
+				variant: 'error',
+				autoHideDuration: 4500,
+				anchorOrigin: {
+					vertical: 'top',
+					horizontal: 'right',
+				},
+			});
+			console.error(error);
 		}
-		/**
-		 * Si el usuario no escribe en el input del email
-		 * significa que solo quiere actualizar la descripción
-		 * o el status de la tarea
-		 * entonces cae en esta mutacion
-		 */
-		await updateTaskMutation({ variables });
-		await refetchTasks();
-		enqueueSnackbar('Entrada actualizada', {
-			variant: 'success',
-			autoHideDuration: 1500,
-			anchorOrigin: {
-				vertical: 'top',
-				horizontal: 'right',
-			},
-		});
-		router.push('/dashboard');
 	};
 
 	return {

@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { DecodedPayload, LoginDTO, LoginResponse, RegisterDTO, User } from '@/types';
 import { LOGIN_MUTATION, SIGN_UP_MUTATION, USER_QUERY } from '@/graphql';
 import { AuthContext, authReducer } from '.';
+import { useRouter } from 'next/navigation';
 
 export interface AuthState {
 	user: User | null;
@@ -15,6 +16,7 @@ const Auth_INITIAL_STATE: AuthState = {
 };
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [state, dispatch] = useReducer(authReducer, Auth_INITIAL_STATE);
+	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [loginMutation] = useMutation(LOGIN_MUTATION);
 	const [signUpMutation] = useMutation(SIGN_UP_MUTATION);
@@ -99,6 +101,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		Cookies.remove('idToken');
 		Cookies.remove('userEmail');
 		dispatch({ type: '[Auth] - Logout' });
+		location.reload();
 	};
 
 	return (
@@ -111,6 +114,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				//* Methods
 				handleLogin,
 				handleSignUp,
+				handleLogout,
 			}}>
 			{children}
 		</AuthContext.Provider>

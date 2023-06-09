@@ -5,6 +5,7 @@ import { useSnackbar } from 'notistack';
 import { CREATE_TASK_MUTATION, DELETE_TASK_MUTATION, GET_TASKS_QUERY } from '@/graphql';
 import { Task } from '@/types';
 import { TasksContext, tasksReducer } from '.';
+import { useAuthContext } from '@/hooks/useAuthContext';
 export interface TasksState {
 	tasks: Task[];
 	isAddingTask: boolean;
@@ -28,6 +29,7 @@ const Tasks_INITIAL_STATE: TasksState = {
 };
 export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [state, dispatch] = useReducer(tasksReducer, Tasks_INITIAL_STATE);
+	const { user } = useAuthContext();
 	const { enqueueSnackbar } = useSnackbar();
 	const [createTaskMutation] = useMutation(CREATE_TASK_MUTATION);
 	const [deleteTaskMutation] = useMutation(DELETE_TASK_MUTATION);
@@ -36,7 +38,7 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const idToken = Cookies.get('idToken');
 	const {
 		data: tasksData,
-		error: errorTasks,
+		loading: fetchingTasks,
 		refetch,
 	} = useQuery(GET_TASKS_QUERY, {
 		variables: { email },
@@ -46,23 +48,60 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			},
 		},
 	});
-	console.log({ idToken });
 
+	/**
+	 * Efecto utilizado para cargar las tareas iniciales cuando el usuario inicia sesión
+	 */
+
+	useEffect(() => {
+		if (fetchingTasks || !tasksData) return;
+		const tasks = tasksData.user.tasks.items as Task[];
+		dispatch({ type: '[Task] - Load Initial Tasks', payload: tasks });
+	}, [tasksData, fetchingTasks]);
+
+	//* Esta función es utilizada cuando se hace un update para actualizar los tasks con los ultimos cambios
 	const refetchTasks = async () => {
 		const { data } = await refetch();
 		dispatch({ type: '[Task] - Load Initial Tasks', payload: data.user.tasks.items });
 	};
+
+	//* Función para cambiar el state de isAddingTask para abrir el formulario
+	//* Para agregar una nueva tarea
+	const toggleAddingTask = () => dispatch({ type: '[Task] - Toggle Add Task' });
+
+	//* Handlers para el modal warning al momento de eliminar una tarea
 	const handleOpenDeleteModal = () => setIsDeleteModalOpen(true);
 	const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
-	const loadInitialTasks = useCallback(() => {
-		if (errorTasks) {
-			dispatch({ type: '[Task] - Set Error', payload: errorTasks.message });
+	//* Handlers para el manejo del Drag And Drop para actualizar el status de una tarea
+	const startDragging = () => dispatch({ type: '[Task] - Start Dragging Task' });
+	const endDragging = () => dispatch({ type: '[Task] - End Dragging Task' });
+	/**
+	 * Para esta operación se esta utilizando una 'Custom function' de 8Base
+	 * Nota: El cambio de status se puede realizar con este drag and drop
+	 * 			 Pero tambien se puede realizar el cambio con el custom hook useTaskUpdate
+	 * 			 El taskUpdate handler se maneja con un custom hook separado de este provider
+	 * 			 Debido a que el codigo es un poco extenso y llevandolo a un custom hook
+	 * 			 Mejora la lectura del codigo y facilita los testings
+	 */
+	const startChangingTaskCompletedStatus = async (taskId: string, completed: boolean) => {
+		try {
+			await fetch('https://api.8base.com/cliouei6v005d08lc3kq130yd/webhook/toggleTaskCompletedStatus', {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify({
+					taskId,
+					completed,
+				}),
+			});
+			dispatch({ type: '[Task] - Change Task Completed Status', payload: { taskId, completed } });
+		} catch (error) {
+			console.error(error);
+			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
 		}
-		if (!tasksData) return;
-		const tasks = tasksData.user.tasks.items as Task[];
-		dispatch({ type: '[Task] - Load Initial Tasks', payload: tasks });
-	}, [tasksData, errorTasks]);
+	};
 
 	const startAddingNewTask = async (description: string) => {
 		try {
@@ -94,39 +133,6 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
 		}
 	};
-
-	useEffect(() => {
-		loadInitialTasks();
-	}, [loadInitialTasks, tasksData]);
-
-	const toggleAddingTask = () => dispatch({ type: '[Task] - Toggle Add Task' });
-	const startDragging = () => {
-		dispatch({ type: '[Task] - Start Dragging Task' });
-	};
-
-	const endDragging = () => {
-		dispatch({ type: '[Task] - End Dragging Task' });
-	};
-
-	const startChangingTaskCompletedStatus = async (taskId: string, completed: boolean) => {
-		try {
-			await fetch('https://api.8base.com/cliouei6v005d08lc3kq130yd/webhook/toggleTaskCompletedStatus', {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				method: 'POST',
-				body: JSON.stringify({
-					taskId,
-					completed,
-				}),
-			});
-			dispatch({ type: '[Task] - Change Task Completed Status', payload: { taskId, completed } });
-		} catch (error) {
-			console.error(error);
-			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
-		}
-	};
-
 	return (
 		<TasksContext.Provider
 			value={{

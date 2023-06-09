@@ -9,6 +9,7 @@ import {
 	CardActions,
 	CardContent,
 	CardHeader,
+	Chip,
 	FormControl,
 	FormControlLabel,
 	FormLabel,
@@ -31,7 +32,7 @@ interface Props {
 	taskId: string;
 }
 export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
-	const router = useRouter()
+	const router = useRouter();
 	const { tasks, handleDelete, isDeleteModalOpen, handleCloseDeleteModal, handleOpenDeleteModal } = useTasksContext();
 	const task = tasks.find(task => task.id === taskId);
 	if (!task) {
@@ -116,7 +117,6 @@ export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
 								</List>
 							</Box>
 						</CardContent>
-
 						<CardActions>
 							<Button
 								startIcon={<SaveOutlinedIcon />}
@@ -169,7 +169,7 @@ export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
 						</Button>
 						<Button
 							onClick={() => {
-								router.push('/dashboard')
+								router.push('/dashboard');
 								handleDelete(task.id);
 								handleCloseDeleteModal();
 							}}

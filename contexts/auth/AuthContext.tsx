@@ -4,6 +4,7 @@ import { LoginDTO, RegisterDTO, User } from '@/types';
 interface ContextProps {
 	user: User | null;
 	isLoading: boolean;
+	handleLogout: () => void;
 	handleLogin: (args: LoginDTO) => Promise<{
 		ok: boolean;
 		msg?: string;
