@@ -4,5 +4,5 @@ interface Props {
 	task: Task;
 }
 export const TaskCard: React.FC<Props> = ({ task }) => {
-	return <div>{task.title}</div>;
+	return <div>{task.description}</div>;
 };

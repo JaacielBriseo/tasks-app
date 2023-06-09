@@ -47,7 +47,6 @@ export const GET_TASKS_QUERY = gql`
 			userTasks {
 				items {
 					id
-					title
 					description
 					completed
 					assignedTo {

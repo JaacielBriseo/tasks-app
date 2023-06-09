@@ -1,9 +1,7 @@
-'use client';
-
-import { Task } from '@/types';
-import { List, Paper } from '@mui/material';
 import { useMemo } from 'react';
-import { TaskCard } from './TaskCard';
+import { List, Paper } from '@mui/material';
+import { Task } from '@/types';
+import { TaskCard } from './';
 
 interface Props {
 	tasks: Task[];
@@ -23,7 +21,13 @@ export const TasksList: React.FC<Props> = ({ tasks, completedStatus }) => {
 		// className={ isDragging ? styles.dragging : '' }
 		>
 			<Paper
-				sx={{ height: 'calc(100vh - 180px)', overflow: 'scroll', backgroundColor: 'transparent', padding: '3px 5px' }}>
+				sx={{
+					height: 'calc(100vh - 100px)',
+					overflow: 'scroll',
+					backgroundColor: 'transparent',
+					'&::-webkit-scrollbar': { display: 'none' },
+					padding: '1px 5px',
+				}}>
 				<List sx={{ opacity: 1, transition: 'all .3s' }}>
 					{tasksByStatus.map(task => (
 						<TaskCard key={task.id} task={task} />

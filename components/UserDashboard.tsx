@@ -1,13 +1,10 @@
-'use client';
-
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@apollo/client';
 import { GET_TASKS_QUERY } from '@/graphql';
 import Cookies from 'js-cookie';
 import { Card, CardHeader, Grid } from '@mui/material';
 import { Task } from '@/types';
-import { NewTask } from './NewTask';
-import { TasksList } from './TasksList';
+import { NewTask, TasksList } from '.';
 
 export const UserDashboard = () => {
 	const router = useRouter();
@@ -21,6 +18,7 @@ export const UserDashboard = () => {
 			},
 		},
 	});
+	console.log({ error });
 	if (loading) return <h1>Loading...</h1>;
 	if (error) return <h1>Error...</h1>;
 	const tasks = data.user.userTasks.items as Task[];
@@ -32,9 +30,10 @@ export const UserDashboard = () => {
 					<Card sx={{ height: 'calc(100vh - 100px )' }}>
 						<CardHeader title='Pendientes' />
 
-						{/* Agregar una nueva entrada */}
-						{/* Listado de las entradas */}
+						{/* Agregar una nueva tarea */}
 						<NewTask />
+
+						{/* Listado de las tareas */}
 						<TasksList tasks={tasks} completedStatus={false} />
 					</Card>
 				</Grid>

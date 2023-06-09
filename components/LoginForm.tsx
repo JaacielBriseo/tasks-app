@@ -1,4 +1,3 @@
-'use client';
 import { useRouter } from 'next/navigation';
 import { Button, Link, TextField } from '@mui/material';
 import { useForm } from '@/hooks/useForm';

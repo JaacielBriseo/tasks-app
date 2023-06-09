@@ -1,11 +1,9 @@
-'use client';
-
 import { useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { Button, Link, TextField } from '@mui/material';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useForm } from '@/hooks/useForm';
 import { RegisterDTO } from '@/types';
-import NextLink from 'next/link';
 
 //* Variable declarada fuera del componente para evitar que se vuelva a computar en cada render
 const initialForm: RegisterDTO = {
