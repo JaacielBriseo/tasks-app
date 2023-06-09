@@ -1,9 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { Button, TextField } from '@mui/material';
+import { Button, Link, TextField } from '@mui/material';
 import { useForm } from '@/hooks/useForm';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { LoginDTO } from '@/types';
+import NextLink from 'next/link';
 
 const initialForm: LoginDTO = {
 	email: '',
@@ -52,10 +53,15 @@ export const LoginForm = () => {
 				onClick={onLogin}
 				variant='contained'
 				color='info'
-				sx={{ mt: 3, py: 1.3, color: 'whitesmoke' }}
+				sx={{ mt: 3, mb: 3, py: 1.3, color: 'whitesmoke' }}
 				fullWidth>
 				Iniciar Sesión
 			</Button>
+			<NextLink href={'/auth/register'} passHref legacyBehavior>
+				<Link variant='subtitle2' sx={{ float: 'right' }} color='#FFFF'>
+					Aun no tienes una cuenta ? Registrate
+				</Link>
+			</NextLink>
 		</>
 	);
 };

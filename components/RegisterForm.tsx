@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button, TextField } from '@mui/material';
+import { Button, Link, TextField } from '@mui/material';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useForm } from '@/hooks/useForm';
 import { RegisterDTO } from '@/types';
+import NextLink from 'next/link';
 
 //* Variable declarada fuera del componente para evitar que se vuelva a computar en cada render
 const initialForm: RegisterDTO = {
@@ -81,10 +82,15 @@ export const RegisterForm = () => {
 				onClick={onSignUp}
 				variant='contained'
 				color='info'
-				sx={{ mt: 3, py: 1.3, color: 'whitesmoke' }}
+				sx={{ mt: 3, mb: 3, py: 1.3, color: 'whitesmoke' }}
 				fullWidth>
 				Registrarme
 			</Button>
+			<NextLink href={'/auth/login'} passHref legacyBehavior>
+				<Link variant='subtitle2' sx={{ float: 'right' }} color='#FFFF'>
+					Ya tienes una cuenta ? Inicia sesión
+				</Link>
+			</NextLink>
 		</>
 	);
 };
