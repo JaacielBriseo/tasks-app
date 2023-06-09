@@ -23,7 +23,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { DeleteOutlined } from '@mui/icons-material';
 import { useTaskUpdate } from '@/hooks/useTaskUpdate';
@@ -31,6 +31,7 @@ interface Props {
 	taskId: string;
 }
 export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
+	const router = useRouter()
 	const { tasks, handleDelete, isDeleteModalOpen, handleCloseDeleteModal, handleOpenDeleteModal } = useTasksContext();
 	const task = tasks.find(task => task.id === taskId);
 	if (!task) {
@@ -168,6 +169,7 @@ export const UpdateTaskForm: React.FC<Props> = ({ taskId }) => {
 						</Button>
 						<Button
 							onClick={() => {
+								router.push('/dashboard')
 								handleDelete(task.id);
 								handleCloseDeleteModal();
 							}}

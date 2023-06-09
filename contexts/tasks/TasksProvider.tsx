@@ -1,5 +1,4 @@
 import { PropsWithChildren, useCallback, useEffect, useReducer, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@apollo/client';
 import Cookies from 'js-cookie';
 import { useSnackbar } from 'notistack';
@@ -28,7 +27,6 @@ const Tasks_INITIAL_STATE: TasksState = {
 	isLoadingTasks: true,
 };
 export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const router = useRouter();
 	const [state, dispatch] = useReducer(tasksReducer, Tasks_INITIAL_STATE);
 	const { enqueueSnackbar } = useSnackbar();
 	const [createTaskMutation] = useMutation(CREATE_TASK_MUTATION);
@@ -90,7 +88,6 @@ export const TasksProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				},
 			});
 			dispatch({ type: '[Task] - Delete Task', payload: taskId });
-			router.push('/dashboard');
 		} catch (error) {
 			console.error(error);
 			dispatch({ type: '[Task] - Set Error', payload: 'Ocurrio algun error, intenta de nuevo mas tarde' });
