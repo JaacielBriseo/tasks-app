@@ -26,6 +26,9 @@ export interface Task {
 	title: string;
 	description: string;
 	completed: boolean;
+	assignedTo: {
+		items: User[];
+	};
 }
 
 export interface DecodedPayload {

@@ -1,6 +1,7 @@
-import { PropsWithChildren, useEffect, useReducer, useState } from 'react';
+import { PropsWithChildren, useReducer, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { decode } from 'jsonwebtoken';
+import Cookies from 'js-cookie';
 import { DecodedPayload, LoginDTO, LoginResponse, RegisterDTO, User } from '@/types';
 import { LOGIN_MUTATION, SIGN_UP_MUTATION, USER_QUERY } from '@/graphql';
 import { AuthContext, authReducer } from '.';
@@ -15,21 +16,9 @@ const Auth_INITIAL_STATE: AuthState = {
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [state, dispatch] = useReducer(authReducer, Auth_INITIAL_STATE);
 	const [isLoading, setIsLoading] = useState(false);
-	const [loginMutation, { data: loginData, loading: loadingLogin, error }] = useMutation(LOGIN_MUTATION);
-	const [signUpMutation, { loading: loadingSignUp }] = useMutation(SIGN_UP_MUTATION);
-	const {
-		data: userData,
-		error: userError,
-		refetch,
-	} = useQuery(USER_QUERY, {
-		variables: { email: localStorage.getItem('email') },
-	});
-
-	useEffect(() => {
-		if (userData) {
-			dispatch({ type: '[Auth] - Login', payload: userData });
-		}
-	}, [userData]);
+	const [loginMutation] = useMutation(LOGIN_MUTATION);
+	const [signUpMutation] = useMutation(SIGN_UP_MUTATION);
+	const { refetch } = useQuery(USER_QUERY);
 
 	const handleSignUp = async ({ email, firstName, lastName, password }: RegisterDTO) => {
 		setIsLoading(true);
@@ -76,8 +65,10 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 					},
 				},
 			} = response as LoginResponse;
+			Cookies.set('idToken', idToken);
 			const decoded = decode(idToken);
 			const { email: decodedEmail } = decoded as DecodedPayload;
+			Cookies.set('userEmail', decodedEmail);
 			if (decodedEmail !== email) {
 				handleLogout();
 				return {
@@ -85,9 +76,8 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 					msg: 'El email no coincide con el token',
 				};
 			}
-			localStorage.setItem('idToken', idToken);
-			localStorage.setItem('email', email);
-			const { data } = await refetch();
+
+			const { data } = await refetch({ email });
 			const { user } = data;
 			dispatch({ type: '[Auth] - Login', payload: user });
 			return {
@@ -106,7 +96,6 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	};
 
 	const handleLogout = () => {
-		localStorage.clear();
 		dispatch({ type: '[Auth] - Logout' });
 	};
 

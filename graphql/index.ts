@@ -42,13 +42,21 @@ export const USER_QUERY = gql`
 `;
 
 export const GET_TASKS_QUERY = gql`
-  query GetTasks($email: String!) {
-    tasksList(filter: { user: { email: { equals: $email } } }) {
-      items {
-        title
-        description
-        completed
-      }
-    }
-  }
+	query User($email: String!) {
+		user(email: $email) {
+			userTasks {
+				items {
+					id
+					title
+					description
+					completed
+					assignedTo {
+						items {
+							firstName
+						}
+					}
+				}
+			}
+		}
+	}
 `;
