@@ -6,14 +6,11 @@ export const getSessionToken = async (req: NextRequest) => {
 	const idToken = req.cookies.get('idToken')?.value;
 
 	if (!idToken) {
-		return null;
+		return false;
 	}
 
 	const decoded = decode(idToken);
-	const { email, family_name, name } = decoded as DecodedPayload;
+	const { email } = decoded as DecodedPayload;
 	Cookies.set('userEmail', email);
-	return {
-		email,
-		fullName: `${name} ${family_name}`,
-	};
+	return true;
 };

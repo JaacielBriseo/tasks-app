@@ -1,28 +1,13 @@
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@apollo/client';
-import { GET_TASKS_QUERY } from '@/graphql';
-import Cookies from 'js-cookie';
 import { Card, CardHeader, Grid } from '@mui/material';
-import { Task } from '@/types';
+import { useTasksContext } from '@/hooks/useTasksContext';
 import { NewTask, TasksList } from '.';
 
 export const UserDashboard = () => {
 	const router = useRouter();
-	const email = Cookies.get('userEmail');
-	const idToken = Cookies.get('idToken');
-	const { data, loading, error } = useQuery(GET_TASKS_QUERY, {
-		variables: { email },
-		context: {
-			headers: {
-				Authorization: `Bearer ${idToken}`,
-			},
-		},
-	});
-	console.log({ error });
-	if (loading) return <h1>Loading...</h1>;
-	if (error) return <h1>Error...</h1>;
-	const tasks = data.user.userTasks.items as Task[];
-	console.log({ tasks });
+	const { tasks, isLoadingTasks } = useTasksContext();
+	if (isLoadingTasks) return <h1>Loading...</h1>;
+
 	return (
 		<>
 			<Grid container spacing={4} sx={{ p: 4 }}>

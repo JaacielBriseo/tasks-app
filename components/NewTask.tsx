@@ -5,14 +5,14 @@ import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 
 export const NewTask = () => {
-	const { isAddingTask, toggleAddingTask } = useTasksContext();
+	const { isAddingTask, toggleAddingTask, startAddingNewTask } = useTasksContext();
 
 	const [inputValue, setInputValue] = useState('');
 	const [touched, setTouched] = useState(false);
 
 	const onSave = () => {
 		if (inputValue.length === 0) return;
-		console.log({ inputValue });
+		startAddingNewTask(inputValue);
 		toggleAddingTask();
 		setInputValue('');
 		setTouched(false);
